@@ -1,21 +1,24 @@
+#Made by Sven Leidenbach
 priors = [0.3333, 0.3333, 0.3333]
 
-tech = [0.00518, 0.0038, 0.0398]
-car = [0.0052, 0.0731, 0.052]
-lab = [0.0104, 0.0038, 0.0459]
+tech = [0.00518134, 0.00384615, 0.03975535]
+car = [0.00518134, 0.07307692, 0.051987767]
+lab = [0.010362694, 0.0038461538, 0.045871559]
 probs = [tech, car, lab]
 
 
-def priors_1(priors_input, list1, list2, list3):
-    post_1 = [a*b for a, b in zip(priors_input, list1)] # something is wrong here!
-    post_2 = [p * o for p, o in zip(priors_input, list2)]
-    post_3 = [a * b for a, b in zip(priors_input, list3)]
-    print(post_2)
-    post_pre = [a + b + c for a, b, c in zip(post_1, post_2, post_3)]
-    post_post = [a / b for a, b in zip(post_1, post_pre)]
-    return post_pre
+def priors_1(priors_input, list1):
+    post_1 = [a*b for a, b in zip(priors_input, list1)] 
+    post_1_1 = (post_1[0]) / (post_1[0] + post_1[1] + post_1[2])
+    post_1_2 = (post_1[1]) / (post_1[0] + post_1[1] + post_1[2])
+    post_1_3 = (post_1[2]) / (post_1[0] + post_1[1] + post_1[2])
+    return post_1_1, post_1_2, post_1_3
 
 
-print(priors_1(priors, tech, car, lab))
+tech_prior = priors_1(priors, tech)
+tech_tech = priors_1(tech_prior, tech)
+tech_tech_car = priors_1(tech_tech, car)
+tech_tech_car_lab = priors_1(tech_tech_car, lab)
+print(tech_tech_car_lab)
 
 
