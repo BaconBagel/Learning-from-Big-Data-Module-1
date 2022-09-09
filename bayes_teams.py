@@ -27,7 +27,7 @@ def remove_stopwords(comment_text):
     return filtered_sentence
 
 
-def sentiment(comment_list): # This sets the criteria for sentiment, for now a placeholder threshold of 10 upvotes is used.
+def sentiment(comment_list): # Update this to identity instead of sentiment, do sentiment seperately. 
     sentiment_list = []
     matches_1 = ["eclerc", "errari", "sainz"]
     matches_2 = ["erstappen", "erez", "Bull", "bull"]
@@ -82,7 +82,7 @@ print(probability_dct[1])
 preset_priors = [0.5, 0.5]
 
 
-def posteriors(priors_input, list1):
+def posteriors(priors_input, list1):  # more dimensions can be added, see posteriors.py file 
     post_1 = [a*b for a, b in zip(priors_input, list1)]
     post_1_1 = (post_1[0]) / (post_1[0] + post_1[1])
     post_1_2 = (post_1[1]) / (post_1[0] + post_1[1])
