@@ -6,7 +6,7 @@ from nltk.corpus import stopwords
 comments = []
 
 
-with open('teams.csv', 'r', encoding="utf-8") as file:
+with open('teamslegacy.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
     for row in rows:
@@ -72,8 +72,8 @@ def likelyhoods(raw_sentiment):
                 elif int(comnt[0]) == 0:
                     post_count_neg[wrd] += 1
 
-    post_count_neg = {key: value / len(raw_sentiment) for key, value in post_count_neg.items()}
-    post_count_pos = {key: value / len(raw_sentiment) for key, value in post_count_pos.items()}
+    post_count_neg = {key: value / len(post_count_neg) for key, value in post_count_neg.items()}
+    post_count_pos = {key: value / len(post_count_pos) for key, value in post_count_pos.items()}
     return post_count_pos, post_count_neg
 
 
@@ -96,7 +96,7 @@ def find_word_probs(comments_inpt):
         addition = []
         for wrd in word_atlas:
             if wrd in commt[-3]:
-                if probability_dct[0][wrd] > 0 and probability_dct[1][wrd] > 0:
+                if probability_dct[0][wrd] >= 0 and probability_dct[1][wrd] >= 0:
                     addition.append([wrd, probability_dct[0][wrd], probability_dct[1][wrd]])
         comments_probs.append([addition, commt])
     return comments_probs
@@ -114,7 +114,7 @@ def classifier(found_probs):
         if len(sentence_probs2) > 0:
             for pair in range(len(sentence_probs2)-1):
                 if counter == 0:
-                    first_pair = sentence_probs2[pair][-2:]
+                    first_pair = posteriors(preset_priors, sentence_probs2[pair][-2:])
                 first_pair = posteriors(first_pair, sentence_probs2[pair+1][-2:])
                 counter += 1
 
