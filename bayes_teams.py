@@ -6,10 +6,10 @@ from nltk.corpus import stopwords
 comments = []
 
 
-with open('teamslegacy.csv', 'r', encoding="utf-8") as file:
+with open('teams.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows:
+    for row in rows[1000:2000]:
         if len(row) > 0:
             comments.extend([row])
 
@@ -85,8 +85,12 @@ preset_priors = [0.5, 0.5]
 
 def posteriors(priors_input, list1):
     post_1 = [a*b for a, b in zip(priors_input, list1)]
-    post_1_1 = (post_1[0]) / (post_1[0] + post_1[1])
-    post_1_2 = (post_1[1]) / (post_1[0] + post_1[1])
+    if post_1[0] + post_1[1] > 0:
+        post_1_1 = (post_1[0]) / (post_1[0] + post_1[1])
+        post_1_2 = (post_1[1]) / (post_1[0] + post_1[1])
+    else:
+        post_1_1 = 0.5
+        post_1_2 = 0.5
     return post_1_1, post_1_2
 
 
@@ -146,8 +150,22 @@ def check_accuracy(prediction_scores):
             wrong_answers += 1
 
         print(right_answers/(right_answers + wrong_answers))
+        print (right_answers, wrong_answers)
 
 
 b = classifier(new_probs)
 c = check_accuracy(b)
+
+comments_check = []
+
+with open('teams.csv', 'r', encoding="utf-8") as file:
+    reader = csv.reader(file)
+    rows = list(reader)
+    for row in rows[2000:3000]:
+        if len(row) > 0:
+            comments_check.extend([row])
+
+new_check = find_word_probs(comments_check)
+classified = classifier(new_check)
+accuracy = check_accuracy(classified)
 
