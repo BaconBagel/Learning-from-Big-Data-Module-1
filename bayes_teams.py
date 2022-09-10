@@ -6,10 +6,10 @@ from nltk.corpus import stopwords
 comments = []
 
 
-with open('teamslegacy.csv', 'r', encoding="utf-8") as file:
+with open('teams.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[0:100]:
+    for row in rows:
         if len(row) > 0:
             comments.extend([row])
 
@@ -19,6 +19,7 @@ def remove_stopwords(comment_text):
     translate_table = dict((ord(char), None) for char in string.punctuation) # Removes punctuation
     comment_text = comment_text.translate(translate_table)
     comment_text = comment_text.replace('’', '')
+    comment_text = comment_text.replace(',', '')
     comment_text_token = nltk.tokenize.word_tokenize(comment_text)
     filtered_sentence = []
     for current_word in comment_text_token:
@@ -27,7 +28,7 @@ def remove_stopwords(comment_text):
     return filtered_sentence
 
 
-def sentiment(comment_list): # Update this to identity instead of sentiment, do sentiment seperately. 
+def sentiment(comment_list): # This sets the criteria for sentiment, for now a placeholder threshold of 10 upvotes is used.
     sentiment_list = []
     matches_1 = ["eclerc", "errari", "sainz"]
     matches_2 = ["erstappen", "erez", "Bull", "bull"]
@@ -82,7 +83,7 @@ print(probability_dct[1])
 preset_priors = [0.5, 0.5]
 
 
-def posteriors(priors_input, list1):  # more dimensions can be added, see posteriors.py file 
+def posteriors(priors_input, list1):
     post_1 = [a*b for a, b in zip(priors_input, list1)]
     post_1_1 = (post_1[0]) / (post_1[0] + post_1[1])
     post_1_2 = (post_1[1]) / (post_1[0] + post_1[1])
@@ -101,25 +102,52 @@ def find_word_probs(comments_inpt):
     return comments_probs
 
 
-newww = find_word_probs(comments)
-print(newww)
+new_probs = find_word_probs(comments)
+print(new_probs)
 
 
 def classifier(found_probs):
+    final_list = []
     for sentence_probs in found_probs:
         sentence_probs2 = sentence_probs[0]
         counter = 0
-        if len(sentence_probs2) > 1:
+        if len(sentence_probs2) > 0:
             for pair in range(len(sentence_probs2)-1):
                 if counter == 0:
                     first_pair = sentence_probs2[pair][-2:]
                 first_pair = posteriors(first_pair, sentence_probs2[pair+1][-2:])
                 counter += 1
 
-            print(first_pair, sentence_probs)
+            final_list.append([first_pair, sentence_probs])
+    return final_list # returns the results of the posteriors and the comment with metadata
 
 
+def check_accuracy(prediction_scores):
+    matches_1 = ["eclerc", "errari", "sainz"]
+    matches_2 = ["erstappen", "erez", "Bull", "bull"]
+    wrong_answers = 1
+    right_answers = 1
+    counter = 0
+    for comment in prediction_scores:
+        # make the prediction
+        if comment[0][0] > comment[0][1]:
+            prediction = "ferrari"
+        elif comment[0][0] <= comment[0][1]:
+            prediction = "red-bull"
+        # check if it is right
+        if any(x in str(comment[-1][-1][1]) for x in matches_1):
+            answer = "ferrari"
+        elif any(x in str(comment[-1][-1][1]) for x in matches_2):
+            answer = "red-bull"
+
+        if prediction == answer:
+            right_answers += 1
+        elif answer == "red-bull" or answer == "ferrari":
+            wrong_answers += 1
+
+        print(right_answers/(right_answers + wrong_answers))
 
 
-b = classifier(newww)
+b = classifier(new_probs)
+c = check_accuracy(b)
 
