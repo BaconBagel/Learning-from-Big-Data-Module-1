@@ -6,10 +6,10 @@ from nltk.corpus import stopwords
 comments = []
 
 
-with open('teams4.csv', 'r', encoding="utf-8") as file:
+with open('teams5.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[0:400]:
+    for row in rows[0:40000]:
         if len(row) > 0:
             comments.extend([row])
 
@@ -28,11 +28,11 @@ def remove_stopwords(comment_text):
     return filtered_sentence
 
 
-def sentiment(comment_list): # This sets the criteria for sentiment, for now a placeholder threshold of 10 upvotes is used.
+def sentiment(comment_list): # Seperates by class
     sentiment_list = []
     matches_1 = ["eclerc", "errari", "sainz"]
     matches_2 = ["erstappen", "erez", "Bull", "bull"]
-    matches_3 = ["amilton", "ercedes" "ussel"]
+    matches_3 = ["amilton", "ercedes" "ussel", "Merc"]
     for user_post in comment_list:
         if len(user_post) > 1:
             if any(x in str(user_post[1]) for x in matches_1):
@@ -61,10 +61,9 @@ def count_words(list_with_text, text_position): #text_position ist the place the
 user_sentiments = sentiment(comments)
 counts = count_words(user_sentiments, -1)
 word_atlas = counts.keys()
-print(counts, word_atlas, user_sentiments)
 
 
-def likelyhoods(raw_sentiment):
+def likelyhoods(raw_sentiment): # calculates chance of each word occuring in class x
     post_count_1 = dict.fromkeys(word_atlas, 0)
     post_count_2 = dict.fromkeys(word_atlas, 0)
     post_count_3 = dict.fromkeys(word_atlas, 0)
@@ -86,38 +85,35 @@ def likelyhoods(raw_sentiment):
 
 
 probability_dct = likelyhoods(user_sentiments)
-print(probability_dct[0])
-print(probability_dct[1])
-preset_priors = [0.333333, 0.3333333, 0.333333]
+preset_priors = [0.33333, 0.33333, 0.33333]
 
 
-def posteriors(priors_input, list1):
+def posteriors(priors_input, list1): # calculates posteriors
     post_1 = [a * b for a, b in zip(priors_input, list1)]
     if post_1[0] + post_1[1] + post_1[2] > 0:
         post_1_1 = (post_1[0]) / (post_1[0] + post_1[1] + post_1[2])
         post_1_2 = (post_1[1]) / (post_1[0] + post_1[1] + post_1[2])
         post_1_3 = (post_1[2]) / (post_1[0] + post_1[1] + post_1[2])
     else:
-        post_1_1 = 0.333333
-        post_1_2 = 0.333333
-        post_1_3 = 0.333333
+        post_1_1 = 0.33333
+        post_1_2 = 0.33333
+        post_1_3 = 0.33333
     return post_1_1, post_1_2, post_1_3
 
 
 def find_word_probs(comments_inpt):
     comments_probs = []
     for commt in comments_inpt:
-        addition = []
-        for wrd in word_atlas:
-            if wrd in commt[-3]:
-                if probability_dct[0][wrd] >= 0 and probability_dct[1][wrd] >= 0 and probability_dct[2][wrd] >= 0:
+        if len(commt) > 1:
+            addition = []
+            for wrd in word_atlas:
+                if wrd in commt[-3]:
                     addition.append([wrd, probability_dct[0][wrd], probability_dct[1][wrd], probability_dct[2][wrd]])
-        comments_probs.append([addition, commt])
+            comments_probs.append([addition, commt])
     return comments_probs
 
 
 new_probs = find_word_probs(comments)
-print(new_probs)
 
 
 def classifier(found_probs):
@@ -139,7 +135,7 @@ def classifier(found_probs):
 def check_accuracy(prediction_scores):
     matches_1 = ["eclerc", "errari", "sainz"]
     matches_2 = ["erstappen", "erez", "Bull", "bull"]
-    matches_3 = ["amilton", "ercedes" "ussel"]
+    matches_3 = ["amilton", "ercedes" "ussel", "Merc"]
 
     wrong_answers = 1
     right_answers = 1
@@ -147,6 +143,7 @@ def check_accuracy(prediction_scores):
     count_merc = 0
     count_ferr = 0
     counter = 0
+    final_results_checker = []
     for comment in prediction_scores:
         # make the prediction
         if comment[0][0] > 0.3333:
@@ -168,9 +165,10 @@ def check_accuracy(prediction_scores):
             right_answers += 1
         elif answer == "red-bull" or answer == "ferrari" or answer == "mercedes":
             wrong_answers += 1
+        final_results_checker.append([prediction, answer, comment])
+        print(right_answers/(right_answers + wrong_answers),right_answers, wrong_answers)
 
-        print(right_answers/(right_answers + wrong_answers))
-        print (right_answers, wrong_answers)
+    return final_results_checker
 
 
 b = classifier(new_probs)
@@ -178,14 +176,19 @@ c = check_accuracy(b)
 
 comments_check = []
 
-with open('teams.csv', 'r', encoding="utf-8") as file:
+with open('teams5.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[400:500]:
+    for row in rows[40000:50000]:
         if len(row) > 0:
             comments_check.extend([row])
 
 new_check = find_word_probs(comments_check)
 classified = classifier(new_check)
 accuracy = check_accuracy(classified)
+
+with open('results_output.csv', 'a', encoding='utf-8') as file:
+    writer = csv.writer(file)
+    writer.writerow(accuracy)
+    file.close()
 
