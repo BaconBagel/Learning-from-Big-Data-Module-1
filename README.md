@@ -27,11 +27,11 @@
 
 ```
 
-The repository content is designed to make participation in Learning from Big Data as easy and enjoyable for you as possible. The content of this repo is being continuously updated until the first day of classes. 
+The repository content is designed to make participation in Learning from Big Data as easy and enjoyable for you as possible. The content of this repo is being continuously updated until the last day of classes. 
 
 In the lectures, we will use R to illustrate implementation-related key points. The code files will be published in this repository ahead of the lecture. Please make sure that you can execute the code, and solve eventual challenges, before joining the class so you can easily follow the coding parts in the lectures.  
 
-For the homework assignment, use the structure found in the final assignment RMarkdown file, which will be soon available.
+For the homework assignment, use the structure found in the final assignment RMarkdown file, available in this repo.
 
 ## Getting up to speed
 
@@ -56,6 +56,7 @@ Advanced reading: On the optimality of naive Bayes - optional [here](https://git
 . Lecture 01-3: Unsupervised Models and NLP. [Blei et al.'s classical paper on LDA](https://dl.acm.org/doi/10.5555/944919.944937) and  [Mikolov et al.'s classical paper on word2vec ](https://arxiv.org/abs/1301.3781).   
 
 
+
 CODE
 
 .Lecture 01-1:
@@ -63,11 +64,18 @@ CODE
 [Supervised-example](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/lectures/Lecture_1/Supervised-example.R)
 
 .Lecture 01-2: [Naive Bayes classifier - fundamentals - a cartoon version in Excel](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/lectures/Lecture_2/Cartoon_Example_NBC.xlsx) and
-[Supervised naive Bayes Classifier](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/lectures/Lecture_2/Supervised-NBC.R)
+[supervised naive Bayes Classifier](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/lectures/Lecture_2/Supervised-NBC.R)
 
 
-.Lecture 01-3: code will be here.  
+.Lecture 01-3:[unsupervised Latend Dirichlet Allocation and Word Embeddings - simple examples using packages](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/lectures/Lecture_3/session%203.Rmd )
 
-.Assignment Module 1: assigment template in [PDF](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/assignment%201/Assignment_1_ERNANUMBER.pdf) and [R markdown](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/assignment%201/Assignment_1_ERNANUMBER.Rmd)
+
+
+ASSIGNMENT MODULE 1
+
+.Assigment template in [PDF](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/assignment%201/Assignment_1_ERNANUMBER.pdf) and [R markdown](https://github.com/guiliberali/Learning-from-Big-Data-Module-1/blob/main/assignment%201/Assignment_1_ERNANUMBER.Rmd)
+
+.Rubric [PDF coming soon](.) 
+
  
 
