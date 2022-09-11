@@ -9,9 +9,10 @@ comments = []
 with open('teams5.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[0:40000]:
+    for row in rows[0:10000][0::2]:
         if len(row) > 0:
             comments.extend([row])
+    file.close()
 
 
 def remove_stopwords(comment_text):
@@ -61,31 +62,45 @@ def count_words(list_with_text, text_position): #text_position ist the place the
 user_sentiments = sentiment(comments)
 counts = count_words(user_sentiments, -1)
 word_atlas = counts.keys()
+priors_from_frequency = []
 
 
 def likelyhoods(raw_sentiment): # calculates chance of each word occuring in class x
     post_count_1 = dict.fromkeys(word_atlas, 0)
     post_count_2 = dict.fromkeys(word_atlas, 0)
     post_count_3 = dict.fromkeys(word_atlas, 0)
+    count1, count2, count3 = 0, 0, 0
 
     for comnt in raw_sentiment:
         for wrd in word_atlas:
             if wrd in comnt[-1]:
                 if int(comnt[0]) == 1:
+                    count1 += 1
                     post_count_1[wrd] += 1
                 elif int(comnt[0]) == 2:
                     post_count_2[wrd] += 1
+                    count2 += 1
                 elif int(comnt[0]) == 3:
                     post_count_3[wrd] += 1
-
-    post_count_1 = {key: value / len(post_count_1) for key, value in post_count_1.items()}
-    post_count_2 = {key: value / len(post_count_2) for key, value in post_count_2.items()}
-    post_count_3 = {key: value / len(post_count_3) for key, value in post_count_3.items()}
+                    count3 += 1
+    post_count_1_old = post_count_1.copy()
+    post_count_2_old = post_count_2.copy()
+    post_count_3_old = post_count_3.copy()
+    for word in word_atlas:
+        post_count_1[word] = (post_count_1_old[word]+1) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
+        post_count_2[word] = (post_count_2_old[word]+1) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
+        post_count_3[word] = (post_count_3_old[word]+1) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
+  #  post_count_1 = {key: (value) / count1 for key, value in post_count_1.items()}
+ #   post_count_2 = {key: (value) / count2 for key, value in post_count_2.items()}
+ #   post_count_3 = {key: (value) / count3 for key, value in post_count_3.items()}
+    print(count1, count2, count3)
+    total = count1 + count2 + count3
+    priors_from_frequency.append([count1/total, count2/total, count3/total])
     return post_count_1, post_count_2, post_count_3
 
 
 probability_dct = likelyhoods(user_sentiments)
-preset_priors = [0.33333, 0.33333, 0.33333]
+preset_priors = [priors_from_frequency[0][0], priors_from_frequency[0][1], priors_from_frequency[0][2]]
 
 
 def posteriors(priors_input, list1): # calculates posteriors
@@ -95,9 +110,10 @@ def posteriors(priors_input, list1): # calculates posteriors
         post_1_2 = (post_1[1]) / (post_1[0] + post_1[1] + post_1[2])
         post_1_3 = (post_1[2]) / (post_1[0] + post_1[1] + post_1[2])
     else:
-        post_1_1 = 0.33333
-        post_1_2 = 0.33333
-        post_1_3 = 0.33333
+        print("error")
+        post_1_1 = priors_from_frequency[0][0]
+        post_1_2 = priors_from_frequency[0][1]
+        post_1_3 = priors_from_frequency[0][2]
     return post_1_1, post_1_2, post_1_3
 
 
@@ -145,6 +161,7 @@ def check_accuracy(prediction_scores):
     counter = 0
     final_results_checker = []
     for comment in prediction_scores:
+        print(comment[0])
         # make the prediction
         if comment[0][0] > 0.3333:
             prediction = "ferrari"
@@ -179,7 +196,7 @@ comments_check = []
 with open('teams5.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[40000:50000]:
+    for row in rows[0:2000][1::2]:
         if len(row) > 0:
             comments_check.extend([row])
 
