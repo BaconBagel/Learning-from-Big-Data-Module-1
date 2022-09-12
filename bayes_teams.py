@@ -4,12 +4,15 @@ import string
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 comments = []
+matches_1 = ["eclerc", "errari", "sainz"]
+matches_2 = ["erstappen", "erez", "Bull", "bull"]
+matches_3 = ["amilton", "ercedes" "ussel", "Merc"]
 
 
-with open('teams5.csv', 'r', encoding="utf-8") as file:
+with open('teams4.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[0:10000][0::2]:
+    for row in rows[0:50000][0::2]:
         if len(row) > 0:
             comments.extend([row])
     file.close()
@@ -87,9 +90,9 @@ def likelyhoods(raw_sentiment): # calculates chance of each word occuring in cla
     post_count_2_old = post_count_2.copy()
     post_count_3_old = post_count_3.copy()
     for word in word_atlas:
-        post_count_1[word] = (post_count_1_old[word]+1) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
-        post_count_2[word] = (post_count_2_old[word]+1) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
-        post_count_3[word] = (post_count_3_old[word]+1) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
+        post_count_1[word] = (post_count_1_old[word]+0.95) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
+        post_count_2[word] = (post_count_2_old[word]+0.95) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
+        post_count_3[word] = (post_count_3_old[word]+0.95) / (3+post_count_1_old[word]+post_count_2_old[word]+post_count_3_old[word])
   #  post_count_1 = {key: (value) / count1 for key, value in post_count_1.items()}
  #   post_count_2 = {key: (value) / count2 for key, value in post_count_2.items()}
  #   post_count_3 = {key: (value) / count3 for key, value in post_count_3.items()}
@@ -163,7 +166,7 @@ def check_accuracy(prediction_scores):
     for comment in prediction_scores:
         print(comment[0])
         # make the prediction
-        if comment[0][0] > 0.3333:
+        if comment[0][0] > 0.3333333:
             prediction = "ferrari"
         elif comment[0][1] > 0.33333333:
             prediction = "red-bull"
@@ -193,10 +196,10 @@ c = check_accuracy(b)
 
 comments_check = []
 
-with open('teams5.csv', 'r', encoding="utf-8") as file:
+with open('teams4.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[0:2000][1::2]:
+    for row in rows[0:50000][1::2]:
         if len(row) > 0:
             comments_check.extend([row])
 
