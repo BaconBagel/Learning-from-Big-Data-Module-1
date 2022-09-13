@@ -6,13 +6,17 @@ import collections
 from itertools import chain
 nltk.download('stopwords')
 from nltk.corpus import stopwords
+num_cats = 12
 comments = []
-
+lower_limit_training = 0
+upper_limit_training = 1500
+lower_limit_testing = 1500
+upper_limit_testing = 2000
 
 with open('3teamsandother.csv', 'r+', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[0:2000]:
+    for row in rows[lower_limit_training:upper_limit_training]:
         if len(row) > 0:
             comments.extend([row])
     file.close()
@@ -40,8 +44,6 @@ def categorise(comments_tosort, num_categories):
     most_common = counters.most_common(num_categories)
     return most_common
 
-
-num_cats = 12
 teams_categories = categorise(comments, num_cats)
 
 
@@ -191,7 +193,7 @@ comments_check = []
 with open('3teamsandother.csv', 'r', encoding="utf-8") as file:
     reader = csv.reader(file)
     rows = list(reader)
-    for row in rows[2000:2500]:
+    for row in rows[lower_limit_testing:upper_limit_testing]:
         if len(row) > 0:
             comments_check.extend([row])
 
