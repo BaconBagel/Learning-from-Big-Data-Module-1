@@ -1,6 +1,7 @@
 import csv
 import nltk
 import string
+import copy
 import time
 import collections
 from itertools import chain
@@ -82,8 +83,8 @@ def likelyhoods(raw_sentiment, n): # calculates chance of each word occuring in 
     for x in range(n):
         initials.append(0)
         counters.append(0)
-    post_counts = dict.fromkeys(word_atlas, initials)
-
+    post_counts2 = {key: initials[:] for key in word_atlas}
+    post_counts = copy.deepcopy(post_counts2)
     for comnt in raw_sentiment:
         for wrd in word_atlas:
             if wrd in comnt[-1]:
@@ -96,6 +97,7 @@ def likelyhoods(raw_sentiment, n): # calculates chance of each word occuring in 
     for word in word_atlas:
         for vec in range(n):
             post_counts[word][vec] = (post_counts_old[word][vec]+1)/(sum(post_counts_old[word])+n)
+
 
     total = sum(counters)
     new_counters = [x / total for x in counters]
@@ -127,13 +129,12 @@ def posteriors(priors_input, list1): # calculates posteriors
 
 def find_word_probs(comments_inpt, num_vecs):
     comments_probs = []
-    app = []
     for commt in comments_inpt:
         if len(commt) > 0:
             addition = []
+            app = []
             for wrd in word_atlas:
                 if wrd in commt[-3]:
-                    app = [wrd]
                     for v in range(num_vecs):
                         appendage = probability_dct[wrd][v]
                         app.append(appendage)
